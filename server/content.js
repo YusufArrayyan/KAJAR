@@ -17,7 +17,7 @@ export const TOPICS = [
   {
     slug: 'logaritma', name: 'Logaritma', keywords: 'logaritma log basis kebalikan eksponen',
     chunks: {
-      penuntun: 'Ingat arti logaritma: ²log 8 bertanya "2 dipangkatkan berapa supaya hasilnya 8?" Coba ubah soalmu ke pertanyaan seperti itu.',
+      penuntun: 'Ingat arti logaritma: ²log 8 bertanya “2 dipangkatkan berapa supaya hasilnya 8?” Coba ubah soalmu ke pertanyaan seperti itu.',
       materi: 'Logaritma adalah kebalikan eksponen: ᵃlog b = c artinya a^c = b, dengan a > 0, a ≠ 1, dan b > 0. Sifat penting: ᵃlog (b × c) = ᵃlog b + ᵃlog c, ᵃlog (b/c) = ᵃlog b − ᵃlog c, ᵃlog bⁿ = n × ᵃlog b, dan ᵃlog a = 1. Kalau bilangan pokok tidak ditulis, artinya bilangan pokok 10.',
       contoh: 'Contoh: hitung ²log 4 + ²log 8.\nLangkah 1: Gabungkan dengan sifat penjumlahan: ²log 4 + ²log 8 = ²log (4 × 8) = ²log 32.\nLangkah 2: Cari pangkat 2 yang hasilnya 32. Karena 2^5 = 32, maka ²log 32 = 5.\nJadi, ²log 4 + ²log 8 = 5.',
       serupa: 'hitung ³log 9 + ³log 3.',

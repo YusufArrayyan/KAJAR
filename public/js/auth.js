@@ -1,5 +1,5 @@
 // Signed-out screens: S0 Masuk, S1 Daftar, staff sign-in, and the public data explanation.
-import { html, raw, api, route, go, setHome, fieldError, clearErrors, busy, banner, LOGO, state } from './app.js';
+import { html, raw, api, route, go, setHome, fieldError, clearErrors, busy, banner, LOGO, state, icon } from './app.js';
 import { privacyBody } from './privacy.js';
 
 const reg = { step: 1, code: '', className: '', nickname: '' };
@@ -19,17 +19,18 @@ const getConfig = () => (configPromise ||= api('/api/config').catch(() => ({ dem
 
 // DEMO_MODE only: judges and visitors sign in with one click, no passwords.
 const DEMO_ACCOUNTS = [
-  ['siswa_baru', 'Siswa baru', 'Mulai dari penjelasan data dan Tes Awal'],
-  ['siswa', 'Siswa (Rani)', 'Sudah berjalan, ada catatan dari Kakak'],
-  ['peninjau', 'Kakak peninjau', 'Antrean tinjauan dan rubrik'],
-  ['guru', 'Guru', 'Dasbor kelas dan insiden'],
-  ['koordinator', 'Koordinator', 'Persetujuan, hasil tes, ekspor'],
-  ['admin', 'Admin', 'Konten, prompt, keamanan, biaya'],
+  ['siswa_baru', 'Siswa baru', 'Mulai dari penjelasan data dan Tes Awal', 'user', 't1'],
+  ['siswa', 'Siswa (Rani)', 'Sudah berjalan, ada catatan dari Kakak', 'book', 't3'],
+  ['peninjau', 'Kakak peninjau', 'Antrean tinjauan dan rubrik', 'hand', 't7'],
+  ['guru', 'Guru', 'Dasbor kelas dan insiden', 'chart', 't4'],
+  ['koordinator', 'Koordinator', 'Persetujuan, hasil tes, ekspor', 'users', 't2'],
+  ['admin', 'Admin', 'Konten, prompt, keamanan, biaya', 'cog', 't6'],
 ];
-const demoPanel = (cfg) => (cfg.demo ? html`<section class="card demo-panel stack-sm" aria-labelledby="demo-h">
-  <span class="chip topic">Mode demo</span><h2 id="demo-h">Masuk cepat untuk juri</h2>
-  <p class="caption">Pilih peran, langsung masuk tanpa kata sandi. Semua data di sini contoh dan diulang dari awal saat server dimulai ulang.</p>
-  <div class="demo-grid">${DEMO_ACCOUNTS.map(([k, label, hint]) => html`<button class="btn secondary" type="button" data-action="demo" data-account="${k}">${label}<small>${hint}</small></button>`)}</div>
+const demoPanel = (cfg) => (cfg.demo ? html`<section class="card demo" aria-labelledby="demo-h">
+  <div class="stack-sm"><span class="chip topic">Mode demo</span><h2 id="demo-h">Masuk cepat untuk juri</h2>
+  <p class="muted">Pilih peran, langsung masuk tanpa kata sandi. Data di sini contoh dan diulang dari awal saat server dimulai ulang.</p></div>
+  <ul class="topic-list" role="list">${DEMO_ACCOUNTS.map(([k, label, hint, ic, tone]) => html`<li><button class="topic-row" type="button" data-action="demo" data-account="${k}">
+    <span class="qi small ${tone}">${icon(ic)}</span><span class="grow"><strong>${label}</strong><span class="caption">${hint}</span></span><span class="go">${icon('back')}</span></button></li>`)}</ul>
   <p class="form-error field-error" role="alert" hidden></p></section>` : '');
 
 const demoActions = {

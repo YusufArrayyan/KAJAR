@@ -1,7 +1,7 @@
 // Student screens S2–S12 (PRD 8.1).
 import {
   html, raw, api, route, go, setHome, state, icon, fmt, toast, announce, confirmDialog, fieldError, clearErrors, busy,
-  studentShell, skeleton, emptyState, errorBlock, banner, applyPrefs, hemat, dataUsage, sessionUsage, logout, esc, LOGO,
+  studentShell, skeleton, emptyState, errorBlock, banner, applyPrefs, hemat, dataUsage, sessionUsage, logout, esc, LOGO, currentTheme,
 } from './app.js';
 import { outbox, convs, clearLocal } from './idb.js';
 import { privacyPoints, privacyBody } from './privacy.js';
@@ -22,11 +22,6 @@ async function refreshMe() {
   return state.me;
 }
 
-function meter(level) {
-  const [label, n] = MASTERY[level] || MASTERY.belum;
-  return html`<span class="row nowrap"><span class="meter" aria-hidden="true">${[0, 1, 2, 3].map((i) => html`<span class="${i <= n && level !== 'belum' ? 'on' : ''}"></span>`)}</span><span class="caption">Penguasaan: ${label}</span></span>`;
-}
-
 // Topic tiles: a short math glyph on a tinted square; the topic name is always printed next to it.
 const TOPIC_TILE = {
   eksponen: ['aⁿ', 't1'], logaritma: ['log', 't2'], 'barisan-aritmetika': ['+b', 't3'], 'barisan-geometri': ['×r', 't4'],
@@ -37,6 +32,18 @@ const topicTile = (slug) => {
   return html`<span class="tile ${tone}" aria-hidden="true">${g}</span>`;
 };
 const LOGO_SMALL = html`<span class="logo-chip">${LOGO}</span>`;
+
+// Compact mastery: four segments plus the level as text (never colour alone).
+function mastery(level) {
+  const [label, n] = MASTERY[level] || MASTERY.belum;
+  return html`<span class="mastery lv-${level}"><span class="meter" aria-hidden="true">${[0, 1, 2, 3].map((i) => html`<span class="${i <= n && level !== 'belum' ? 'on' : ''}"></span>`)}</span><span><span class="sr-only">Penguasaan: </span>${label}</span></span>`;
+}
+
+function topicRow(t, withSize = false) {
+  const left = t.remaining ? `${t.remaining} soal lagi` : 'Semua soal selesai';
+  return html`<li><a class="topic-row" href="/latihan/${t.slug}">${topicTile(t.slug)}<span class="grow"><strong>${t.name}</strong>
+    <span class="sub">${mastery(t.mastery)}<span class="caption num">${left}${withSize ? ` · ±${t.size_kb} KB` : ''}</span></span></span><span class="go">${icon('back')}</span></a></li>`;
+}
 
 // ---------------------------------------------------------------- Outbox (F-LOW-2)
 const chat = { convId: null, messages: [], pending: [], more: false, remaining: null, limitHit: false, sending: false, lastError: null };
@@ -212,12 +219,13 @@ export default function register() {
     const me = d.me;
     if (!me.onboarded) return { redirect: '/mulai' };
     const c = d.continue;
+    const total = d.topics.length || 9;
     const mastered = d.topics.filter((t) => t.mastery === 'cukup' || t.mastery === 'kuat').length;
-    const forYou = [...d.topics.filter((t) => d.recommended.includes(t.slug)), ...d.topics.filter((t) => !d.recommended.includes(t.slug))];
+    const rec = d.topics.filter((t) => d.recommended.includes(t.slug) && t.slug !== c?.slug).slice(0, 3);
     const menu = [
-      me.pretest_done ? ['/tes/awal/hasil', 'chart', 'Hasil Tes', 't3'] : ['/tes/awal', 'grad', 'Tes Awal', 't3'],
+      me.pretest_done ? ['/tes/awal/hasil', 'chart', 'Hasil tes', 't3'] : ['/tes/awal', 'grad', 'Tes Awal', 't3'],
       ['/latihan', 'book', 'Latihan', 't1'],
-      ['/tanya', 'chat', 'Tanya KAJAR', 't7'],
+      ['/tanya', 'chat', 'Tanya', 't7'],
       ['/riwayat', 'list', 'Riwayat', 't4'],
     ];
     return {
@@ -225,33 +233,32 @@ export default function register() {
       body: shell('/beranda', html`<div class="stack">
         <header class="hero">
           <div class="row between"><span class="brand on-hero">${LOGO_SMALL}<span translate="no">KAJAR</span></span>
-            <a class="chip glass" href="/profil">${icon(hemat() ? 'check' : 'info')}Hemat Data ${hemat() ? 'aktif' : 'mati'}</a></div>
+            <a class="hero-link" href="/profil">${icon(hemat() ? 'check' : 'info')}Hemat data ${hemat() ? 'aktif' : 'mati'}</a></div>
           <h1>Halo, ${me.name}!</h1>
-          <p>Kelas ${me.class_name || '–'} · Mau belajar apa hari ini?</p>
-          <div class="hero-stats">
-            <div><strong class="num">${me.remaining ?? '–'}</strong><span>Sisa pertanyaan hari ini</span></div>
-            <div><strong class="num">${mastered}/${d.topics.length || 9}</strong><span>Topik dikuasai</span></div>
-            <div><strong class="num">${d.notes.length}</strong><span>Catatan baru</span></div>
+          <p>Kelas ${me.class_name || '–'}. Mau belajar apa hari ini?</p>
+          <div class="hero-progress">
+            <div class="row between"><span>Topik yang sudah kamu kuasai</span><strong class="num">${mastered} dari ${total}</strong></div>
+            <div class="bar" role="progressbar" aria-label="Topik dikuasai" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${mastered}"><span data-w="${Math.round((mastered / total) * 100)}"></span></div>
           </div>
         </header>
-        ${d.offline ? banner('info', 'Kamu sedang offline. Latihan yang pernah dibuka tetap bisa dibaca.') : ''}
         <nav class="quick" aria-label="Menu cepat">${menu.map(([href, ic, label, tone]) => html`<a href="${href}"><span class="qi ${tone}">${icon(ic)}</span>${label}</a>`)}</nav>
-        ${!me.pretest_done ? html`<section class="card promo stack-sm" aria-labelledby="pre-h"><span class="chip warn">Langkah pertama</span><h2 id="pre-h">Mulai dengan Tes Awal (±15 menit)</h2>
-          <p class="muted">Ini bukan nilai sekolah. Tujuannya supaya KAJAR tahu mulai dari mana.</p><a class="btn" href="/tes/awal">Mulai Tes Awal</a></section>` : ''}
-        ${me.posttest_open && !me.posttest_done && me.pretest_done ? html`<section class="card promo stack-sm"><span class="chip topic">Baru dibuka</span><h2>Tes Akhir</h2>
-          <p class="muted">15 soal, mirip Tes Awal. Hasilnya membantu gurumu menilai apakah program ini berguna.</p><a class="btn" href="/tes/akhir">Mulai Tes Akhir</a></section>` : ''}
-        ${c ? html`<section class="stack-sm" aria-labelledby="cont-h"><h2 id="cont-h" class="section-title">${icon('clock')}Lanjutkan belajar</h2>
-          <a class="card card-link row nowrap" href="/latihan/${c.slug}">${topicTile(c.slug)}<span class="grow stack-sm"><strong>${c.name}</strong>
-            <span class="row">${meter(c.mastery)}<span class="caption">· ${c.remaining} soal tersisa</span></span></span><span class="go" aria-hidden="true">${icon('back')}</span></a></section>` : ''}
-        ${me.consent?.complete ? html`<a class="card card-link ask row nowrap" href="/tanya"><span class="qi t7">${icon('chat')}</span><span class="grow"><strong>Ada soal yang bikin bingung?</strong><br>
-            <span class="caption">Tanya KAJAR, dibantu langkah demi langkah.</span></span><span class="btn small">Tanya</span></a>`
+        ${d.offline ? banner('info', 'Kamu sedang offline. Latihan yang pernah dibuka tetap bisa dibaca.') : ''}
+        ${!me.pretest_done ? html`<section class="card promo" aria-labelledby="pre-h"><span class="qi t9">${icon('grad')}</span><div class="stack-sm grow">
+          <h2 id="pre-h">Mulai dengan Tes Awal</h2><p class="muted">15 soal, sekitar 15 menit. Ini bukan nilai sekolah; KAJAR jadi tahu harus mulai dari mana.</p>
+          <a class="btn" href="/tes/awal">Mulai Tes Awal</a></div></section>` : ''}
+        ${me.posttest_open && !me.posttest_done && me.pretest_done ? html`<section class="card promo"><span class="qi t1">${icon('grad')}</span><div class="stack-sm grow"><h2>Tes Akhir sudah dibuka</h2>
+          <p class="muted">15 soal, mirip Tes Awal. Hasilnya membantu gurumu menilai apakah program ini berguna.</p><a class="btn" href="/tes/akhir">Mulai Tes Akhir</a></div></section>` : ''}
+        ${c ? html`<section class="stack-sm" aria-labelledby="cont-h"><h2 id="cont-h" class="section-title">Lanjutkan belajar</h2>
+          <a class="card card-link continue" href="/latihan/${c.slug}">${topicTile(c.slug)}<span class="grow"><strong>${c.name}</strong>
+            <span class="caption">${c.remaining ? `${c.remaining} soal lagi` : 'Semua soal selesai'}</span>${mastery(c.mastery)}</span><span class="go">${icon('back')}</span></a></section>` : ''}
+        ${me.consent?.complete ? html`<a class="card card-link ask" href="/tanya"><span class="qi t7">${icon('chat')}</span><span class="grow"><strong>Ada soal yang bikin bingung?</strong>
+            <span class="caption">Tanya KAJAR, dibantu langkah demi langkah. Sisa ${me.remaining ?? '–'} pertanyaan hari ini.</span></span><span class="go">${icon('back')}</span></a>`
           : html`<div class="card flat"><p>Kelasmu belum selesai disiapkan. Latihan sudah bisa dipakai. Tanya Bebas akan aktif setelah gurumu menyelesaikan persetujuan.</p></div>`}
-        ${forYou.length ? html`<section class="stack-sm" aria-labelledby="topik-h"><div class="row between"><h2 id="topik-h" class="section-title">${icon('book')}Topik untukmu</h2><a href="/latihan" class="caption">Lihat semua</a></div>
-          <ul class="rail" role="list">${forYou.slice(0, 6).map((t) => html`<li><a class="card card-link topic-card" href="/latihan/${t.slug}">${topicTile(t.slug)}
-            ${d.recommended.includes(t.slug) ? html`<span class="chip warn">Disarankan</span>` : ''}<strong>${t.name}</strong>${meter(t.mastery)}</a></li>`)}</ul></section>` : ''}
-        ${d.notes.length ? html`<section class="stack-sm" aria-labelledby="notes-h"><h2 id="notes-h" class="section-title">${icon('hand')}Catatan dari Kakak (${d.notes.length} baru)</h2>
-          <ul class="list card tight">${d.notes.map((n) => html`<li><a class="list-item" href="/tanya/${n.conversation_id}"><span class="qi small t6">${icon(n.author ? 'hand' : 'info')}</span>
-          <span class="grow"><strong>${n.author ? `Kak ${n.author}` : 'Pemberitahuan'}</strong><br><span class="caption break">${n.preview}</span></span></a></li>`)}</ul></section>` : ''}
+        ${rec.length ? html`<section class="stack-sm" aria-labelledby="rec-h"><div class="row between"><h2 id="rec-h" class="section-title">Disarankan untukmu</h2><a href="/latihan" class="more">Semua topik</a></div>
+          <ul class="card topic-list" role="list">${rec.map((t) => topicRow(t))}</ul></section>` : ''}
+        ${d.notes.length ? html`<section class="stack-sm" aria-labelledby="notes-h"><h2 id="notes-h" class="section-title">Catatan dari Kakak <span class="count">${d.notes.length} baru</span></h2>
+          <ul class="card topic-list" role="list">${d.notes.map((n) => html`<li><a class="topic-row" href="/tanya/${n.conversation_id}"><span class="qi small t3">${icon(n.author ? 'hand' : 'info')}</span>
+          <span class="grow"><strong>${n.author ? `Kak ${n.author}` : 'Pemberitahuan'}</strong><span class="caption break">${n.preview}</span></span><span class="go">${icon('back')}</span></a></li>`)}</ul></section>` : ''}
       </div>`),
     };
   }, { shell: (b) => shell('/beranda', b) });
@@ -260,13 +267,12 @@ export default function register() {
   route('/latihan', async () => {
     const d = await api('/api/topics');
     const rec = d.topics.filter((t) => d.recommended.includes(t.slug));
-    const card = (t) => html`<li><a class="card card-link topic-card" href="/latihan/${t.slug}">${topicTile(t.slug)}
-      <strong>${t.name}</strong>${meter(t.mastery)}<span class="caption num">${t.remaining ? `${t.remaining} soal tersisa` : 'Selesai'} · ±${t.size_kb} KB</span></a></li>`;
+    const rest = d.topics.filter((t) => !d.recommended.includes(t.slug));
     return {
       title: 'Latihan',
       body: shell('/latihan', html`<div class="stack"><header class="page-head"><h1>Latihan</h1><p class="muted">Matematika kelas X. Coba dulu, minta petunjuk kalau buntu.</p></header>
-        ${rec.length ? html`<section class="stack-sm"><h2 class="section-title">${icon('check')}Disarankan untukmu</h2><p class="caption">Dari hasil Tes Awal.</p><ul class="topic-grid" role="list">${rec.map(card)}</ul></section>` : ''}
-        <section class="stack-sm"><h2 class="section-title">${icon('book')}Semua topik</h2><ul class="topic-grid" role="list">${d.topics.map(card)}</ul></section>
+        ${rec.length ? html`<section class="stack-sm" aria-labelledby="rec-h"><h2 id="rec-h" class="section-title">Disarankan untukmu <span class="count">dari Tes Awal</span></h2><ul class="card topic-list" role="list">${rec.map((t) => topicRow(t, true))}</ul></section>` : ''}
+        <section class="stack-sm" aria-labelledby="all-h"><h2 id="all-h" class="section-title">${rec.length ? 'Topik lainnya' : 'Semua topik'}</h2><ul class="card topic-list" role="list">${(rec.length ? rest : d.topics).map((t) => topicRow(t, true))}</ul></section>
         <details class="card"><summary><strong>Cara menghitung tingkat penguasaan</strong></summary><p class="muted">${d.rule}</p></details>
       </div>`),
     };
@@ -517,7 +523,7 @@ export default function register() {
           <p class="help">Tanpa animasi dan riwayat dimuat sedikit demi sedikit.</p>
           <hr class="sep">
           <div class="field"><label for="tema">Tema</label><select id="tema" data-change="tema">
-            ${[['sistem', 'Ikuti pengaturan ponsel'], ['terang', 'Terang'], ['gelap', 'Gelap']].map(([v, l]) => html`<option value="${v}" ${(prefs.tema || localStorage.getItem('kajar-tema') || 'terang') === v ? 'selected' : ''}>${l}</option>`)}</select></div>
+            ${[['sistem', 'Ikuti pengaturan ponsel'], ['terang', 'Terang'], ['gelap', 'Gelap']].map(([v, l]) => html`<option value="${v}" ${currentTheme() === v ? 'selected' : ''}>${l}</option>`)}</select></div>
           <div class="field"><label for="ukuran">Ukuran teks</label><select id="ukuran" data-change="ukuran">
             ${[['normal', 'Normal'], ['besar', 'Besar'], ['sangat-besar', 'Sangat besar']].map(([v, l]) => html`<option value="${v}" ${(prefs.ukuran || 'normal') === v ? 'selected' : ''}>${l}</option>`)}</select></div>
         </section>

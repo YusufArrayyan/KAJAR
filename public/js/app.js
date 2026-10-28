@@ -97,14 +97,19 @@ export async function api(path, { method = 'GET', body, raw: asText } = {}) {
 export const state = { me: null, view: null, data: {} };
 export const loginPath = () => (location.pathname.startsWith('/staf') || ['reviewer', 'teacher', 'coordinator', 'admin'].includes(state.lastRole) ? '/staf/masuk' : '/masuk');
 
+// Light is the default. Another theme applies only after the user picks it in Profil
+// (stored under a new key, so values saved automatically by older builds are ignored).
+export const THEME_KEY = 'kajar-tema-pilihan';
+export const currentTheme = () => localStorage.getItem(THEME_KEY) || 'terang';
 export function applyPrefs(prefs = {}) {
   const root = document.documentElement;
-  const tema = prefs.tema || localStorage.getItem('kajar-tema') || 'terang';
+  localStorage.removeItem('kajar-tema');
+  if (prefs.tema) localStorage.setItem(THEME_KEY, prefs.tema);
+  const tema = currentTheme();
   if (tema === 'sistem') root.removeAttribute('data-theme'); else root.dataset.theme = tema;
   root.dataset.size = prefs.ukuran || localStorage.getItem('kajar-ukuran') || 'normal';
   const hemat = prefs.hemat ?? (localStorage.getItem('kajar-hemat') !== '0');
   root.dataset.hemat = hemat ? '1' : '0';
-  localStorage.setItem('kajar-tema', tema);
   localStorage.setItem('kajar-ukuran', root.dataset.size);
   localStorage.setItem('kajar-hemat', hemat ? '1' : '0');
 }
