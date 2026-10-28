@@ -522,3 +522,4 @@ fieldset.card > legend + * { clear: both; }
 }
 .topic-row .grow .sub { display: flex; flex-wrap: wrap; align-items: center; gap: 2px var(--s3); margin-top: 4px; }
 .topic-row .grow .sub .caption { margin: 0; }
+.stat .chip { white-space: normal; text-align: left; }

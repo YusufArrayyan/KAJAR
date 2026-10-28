@@ -79,6 +79,26 @@ Repo ini sudah berisi Blueprint (`render.yaml`): satu web service Node di region
 
 Catatan paket gratis: layanan tidur setelah sekitar 15 menit tanpa pengunjung, dan pembukaan pertama sesudahnya butuh kira-kira satu menit. Basis data SQLite tidak permanen: setiap deploy atau restart mengulang data demo dari awal. Untuk data yang bertahan, pakai paket berbayar dengan persistent disk (petunjuk ada di bagian bawah `render.yaml`).
 
+## Video demo dan mockup untuk esai
+
+Skrip di `tools/media/` membuat video penggunaan bersuara dan gambar mockup ponsel. Hasilnya masuk ke `media/` (tidak ikut git karena besar).
+
+| Berkas | Isi |
+|---|---|
+| `media/kajar-demo.mp4` | Video 1920×1080, ±2,5 menit, narasi bahasa Indonesia, 10 adegan |
+| `media/kajar-demo.srt` | Subtitle narasi |
+| `media/mockup/gambar-1-siswa.png` | Gambar esai: Masuk, Beranda, Tanya KAJAR, Latihan |
+| `media/mockup/gambar-2-peninjau-guru.png` | Gambar esai: Peninjau, Dasbor guru, Mutu AI |
+| `media/mockup/*.png` | Tiap layar dalam bingkai ponsel (latar transparan) dan tangkapan layar polos (`layar-*.png`) |
+
+Membuat ulang (butuh Python dengan `playwright`, `edge-tts`, `imageio-ffmpeg`, `Pillow`; narasi dibuat oleh layanan suara Microsoft lewat `edge-tts`):
+
+1. Ubah naskah di `tools/media/scenes.json` bila perlu, lalu buat suara: `python tools/media/voice.py` (suara laki-laki: `python tools/media/voice.py id-ID-ArdiNeural`).
+2. Jalankan server rekaman dengan data baru: `DB_PATH=media/rec.db PORT=3300 NODE_ENV=production npm start`.
+3. `python tools/media/record.py http://localhost:3300`
+4. `python tools/media/mockups.py http://localhost:3300`
+5. `python tools/media/build_video.py`
+
 ## Memeriksa mutu
 
 ```bash

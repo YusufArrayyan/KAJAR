@@ -130,9 +130,11 @@ async function refreshPendingUi() {
   scrollChat();
 }
 
+// Scroll to the very bottom: the page padding keeps the newest message above the fixed composer.
+// (scrollIntoView on the end marker left the last bubble hidden behind the composer.)
 function scrollChat() {
-  const end = document.getElementById('chat-end');
-  if (end) end.scrollIntoView({ block: 'end', behavior: hemat() ? 'auto' : 'smooth' });
+  if (!document.getElementById('chat-end')) return;
+  window.scrollTo({ top: document.documentElement.scrollHeight, behavior: hemat() ? 'auto' : 'smooth' });
 }
 
 function showLimit() {
@@ -286,7 +288,7 @@ export default function register() {
     const head = html`<div class="topbar">${back('/latihan', 'Kembali ke daftar topik')}<h1 class="grow truncate">${d.topic.name}</h1>${q ? html`<span class="caption num" aria-label="Soal ${d.position} dari ${d.total}">${d.position}/${d.total}</span>` : ''}</div>`;
     if (!q) return { title: d.topic.name, body: shell('/latihan', html`${head}${emptyState('Belum ada soal terbit untuk topik ini.', html`<a class="btn" href="/latihan">Pilih topik lain</a>`)}`) };
     const local = { q, solved: false, tried: false };
-    const hintsHtml = (hints) => hints.map((h) => html`<div class="hint-box"><span class="chip hint">Petunjuk ${h.level} dari 4</span><p>${h.text}</p></div>`);
+    const hintsHtml = (hints) => html`${hints.map((h) => html`<div class="hint-box"><span class="chip hint">Petunjuk ${h.level} dari 4</span><p>${h.text}</p></div>`)}`;
     const fullBtn = (can) => html`<button class="btn ghost" type="button" data-action="full" ${can ? '' : raw('aria-disabled="true"')} aria-describedby="full-help">Lihat langkah lengkap</button>
       <p class="help" id="full-help">${can ? 'Langkah lengkap sudah bisa dibuka.' : 'Bisa dibuka setelah kamu mencoba sekali atau memakai dua petunjuk.'}</p>`;
     return {

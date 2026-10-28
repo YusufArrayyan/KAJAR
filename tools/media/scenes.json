@@ -1,0 +1,62 @@
+[
+  {
+    "id": "01-masuk",
+    "title": "KAJAR, Kawan Belajar",
+    "caption": "Tutor Matematika berbasis chat untuk pelajar SMA. Halaman pertama sekitar 30 KB.",
+    "voice": "Ini KAJAR, Kawan Belajar. Tutor Matematika berbasis chat untuk pelajar SMA, dibuat ringan supaya tetap jalan di ponsel murah dan sinyal yang naik turun. Siswa masuk cukup dengan nama panggilan dan PIN, tanpa email dan tanpa nomor telepon."
+  },
+  {
+    "id": "02-beranda",
+    "title": "Beranda siswa",
+    "caption": "Kemajuan topik, latihan yang bisa dilanjutkan, dan catatan dari Kakak peninjau.",
+    "voice": "Di beranda, Rani melihat berapa topik yang sudah ia kuasai, latihan yang bisa dilanjutkan, dan catatan dari Kakak mahasiswa yang memeriksa jawaban AI."
+  },
+  {
+    "id": "03-tanya",
+    "title": "Tangga petunjuk",
+    "caption": "Diminta jawaban langsung, KAJAR memberi pertanyaan penuntun. Petunjuk 1 dari 4.",
+    "voice": "Sekarang Rani bertanya, dan meminta jawabannya langsung. KAJAR menolak dengan halus, lalu memberi satu pertanyaan penuntun. Ini petunjuk tingkat satu dari empat."
+  },
+  {
+    "id": "04-mencoba",
+    "title": "Siswa mencoba, petunjuk naik",
+    "caption": "Jawaban akhir baru diberikan setelah siswa mencoba sendiri.",
+    "voice": "Setiap kali Rani mencoba, petunjuknya naik satu tingkat. Jawaban akhir baru keluar setelah ia berusaha sendiri. Setiap balasan diberi label Jawaban AI, lengkap dengan tombol untuk menandai jawaban yang membingungkan atau salah."
+  },
+  {
+    "id": "05-tandai",
+    "title": "Siswa menandai jawaban",
+    "caption": "Tombol Salah dan Tanya Kakak Mahasiswa memasukkan jawaban ke antrean peninjau.",
+    "voice": "Kalau ragu, Rani cukup menekan Salah, atau Tanya Kakak Mahasiswa. Jawaban itu langsung masuk antrean peninjau."
+  },
+  {
+    "id": "06-offline",
+    "title": "Tetap jalan saat sinyal hilang",
+    "caption": "Pesan disimpan di ponsel dan terkirim sendiri saat sinyal kembali.",
+    "voice": "Saat sinyal hilang, pesan tidak hilang. KAJAR menyimpannya di ponsel dengan tanda menunggu sinyal, lalu mengirimnya sendiri begitu sinyal kembali."
+  },
+  {
+    "id": "07-latihan",
+    "title": "Latihan dari bank soal",
+    "caption": "Soal terkurasi dengan solusi bertahap. Coba dulu, minta petunjuk kalau buntu.",
+    "voice": "Di menu Latihan, soal diambil dari bank soal yang ditinjau guru. Rani meminta petunjuk, menulis jawabannya, lalu memeriksanya."
+  },
+  {
+    "id": "08-peninjau",
+    "title": "Kakak mahasiswa meninjau",
+    "caption": "Tanpa nama siswa. Rubrik empat butir: kebenaran, kejelasan, tingkat, keamanan.",
+    "voice": "Di sisi lain, mahasiswa peninjau membuka antrean. Ia melihat percakapan tanpa nama siswa, menilai dengan rubrik empat butir, lalu menulis koreksi singkat."
+  },
+  {
+    "id": "09-catatan",
+    "title": "Koreksi sampai ke siswa",
+    "caption": "Catatan manusia tampil terpisah dari jawaban AI.",
+    "voice": "Koreksi itu sampai ke Rani sebagai Catatan dari Kakak, dengan tampilan yang jelas berbeda dari jawaban AI."
+  },
+  {
+    "id": "10-guru",
+    "title": "Dasbor guru dan koordinator",
+    "caption": "Keaktifan kelas, mutu jawaban AI, dan hasil tes, tanpa nama siswa.",
+    "voice": "Guru dan dosen pembimbing memantau keaktifan kelas, mutu jawaban AI, dan hasil tes awal serta akhir. KAJAR masih prototipe, dan semua data di video ini data contoh. Langkah berikutnya adalah uji coba satu semester di SMA di Bengkulu."
+  }
+]

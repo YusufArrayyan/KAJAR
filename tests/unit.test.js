@@ -72,6 +72,9 @@ test('intent routing (9.1 step 3)', () => {
   assert.equal(classifyIntent('tunjukkan langkah lengkap', DEFAULTS.refused_topics), 'langkah_lengkap');
   assert.equal(classifyIntent('main game apa yang seru', DEFAULTS.refused_topics), 'di_luar_belajar');
   assert.equal(classifyIntent('masih bingung', DEFAULTS.refused_topics), 'minta_petunjuk');
+  // Regression: "gim" (game) must not match the everyday word "gimana".
+  assert.equal(classifyIntent('kalau rasio barisan geometri gimana nyarinya?', DEFAULTS.refused_topics), 'belajar');
+  assert.equal(classifyIntent('main gim apa yang seru', DEFAULTS.refused_topics), 'di_luar_belajar');
   assert.ok(looksLikeAttempt('23 - 11 = 4 x beda?'));
   assert.ok(looksLikeAttempt('4'));
   assert.ok(!looksLikeAttempt('suku ke-3 adalah 11'));

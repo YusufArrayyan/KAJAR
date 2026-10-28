@@ -29,9 +29,10 @@ export const normalize = (text) =>
 
 const lower = (s) => ` ${String(s).toLowerCase().replace(/[^\p{L}\p{N}\s-]/gu, ' ').replace(/\s+/g, ' ')} `;
 
+// Whole-word (or whole-phrase) match. Prefix matching made "gim" (game) catch "gimana".
 function matchAny(text, list) {
   const t = lower(text);
-  return list.find((w) => t.includes(` ${w.toLowerCase()}`)) || null;
+  return list.find((w) => t.includes(lower(w))) || null;
 }
 
 // Returns { severity: 'tinggi' | 'sedang' | null, term }
