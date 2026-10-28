@@ -13,7 +13,8 @@ import { TOPICS, PRACTICE, ASSESS, PROMPT_V1, LICENSE } from './content.js';
 import { answersMatch } from './ai/mathcheck.js';
 
 export const DEMO = {
-  staffPassword: 'kajar-demo-2026',
+  // Public deployments set DEMO_STAFF_PASSWORD so the README password does not open a live admin.
+  staffPassword: process.env.DEMO_STAFF_PASSWORD || 'kajar-demo-2026',
   codes: { 'X-1': 'MATEKX01', 'X-2': 'MATEKX02' },
 };
 

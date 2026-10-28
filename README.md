@@ -51,6 +51,17 @@ npm install
 
 Lalu salin `.env.example` menjadi `.env` dan isi `LLM_PROVIDER=anthropic`, `LLM_MODEL`, dan `ANTHROPIC_API_KEY`. Nama model hanya ditulis di `.env`, tidak di kode (PRD 9.5). Bila penyedia gagal, sistem jatuh ke penyedia cadangan (`LLM_FALLBACK_PROVIDER`, bawaan `mock`) dan Latihan tetap berjalan.
 
+## Deploy ke Render
+
+Repo ini sudah berisi Blueprint (`render.yaml`): satu web service Node di region Singapura, paket gratis.
+
+1. Push repo ke GitHub.
+2. Di Render: **New → Blueprint**, pilih repo `KAJAR`, lalu **Apply**.
+3. Render menanyakan `LLM_MODEL` dan `ANTHROPIC_API_KEY`. Untuk demo mode `mock`, biarkan kosong.
+4. Setelah deploy selesai, buka **Environment** di layanan `kajar` dan salin nilai `DEMO_STAFF_PASSWORD`. Itu kata sandi semua akun staf demo di server publik; `kajar-demo-2026` hanya berlaku di laptop.
+
+Catatan paket gratis: layanan tidur setelah sekitar 15 menit tanpa pengunjung, dan pembukaan pertama sesudahnya butuh kira-kira satu menit. Basis data SQLite tidak permanen: setiap deploy atau restart mengulang data demo dari awal. Untuk data yang bertahan, pakai paket berbayar dengan persistent disk (petunjuk ada di bagian bawah `render.yaml`).
+
 ## Memeriksa mutu
 
 ```bash

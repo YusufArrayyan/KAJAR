@@ -131,3 +131,16 @@ test('F-ADM-2 publishing requires complete items', () => {
 test('F-AUTH-1 join codes are 8 chars without look-alike characters', () => {
   for (let i = 0; i < 200; i++) assert.match(newJoinCode(), /^[A-HJKMNP-Z2-9]{8}$/);
 });
+
+test('PRD 11 rate limits key on the real client behind a proxy', async () => {
+  const { clientIp } = await import('../server/http.js');
+  const req = { headers: { 'x-forwarded-for': '6.6.6.6, 203.0.113.7' }, socket: { remoteAddress: '10.0.0.1' } };
+  assert.equal(clientIp(req), '10.0.0.1', 'headers ignored unless TRUST_PROXY=1');
+  process.env.TRUST_PROXY = '1';
+  try {
+    assert.equal(clientIp(req), '203.0.113.7', 'last hop is the one the proxy added');
+    assert.equal(clientIp({ headers: {}, socket: { remoteAddress: '10.0.0.1' } }), '10.0.0.1');
+  } finally {
+    delete process.env.TRUST_PROXY;
+  }
+});

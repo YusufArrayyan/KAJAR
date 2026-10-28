@@ -117,7 +117,15 @@ export function rateLimit(key, max, windowMs) {
 }
 export const resetRateLimits = () => buckets.clear();
 
-export const clientIp = (req) => req.socket.remoteAddress || 'unknown';
+// Behind a reverse proxy (Render, Fly, Nginx) set TRUST_PROXY=1. The proxy appends the real client
+// address as the last X-Forwarded-For entry; earlier entries can be forged by the client.
+export function clientIp(req) {
+  if (process.env.TRUST_PROXY === '1') {
+    const xff = String(req.headers['x-forwarded-for'] || '').split(',').map((s) => s.trim()).filter(Boolean);
+    if (xff.length) return xff[xff.length - 1];
+  }
+  return req.socket.remoteAddress || 'unknown';
+}
 
 // Tiny schema validator (stand-in for Zod so the server stays dependency-free).
 export function check(body, spec) {
