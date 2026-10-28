@@ -28,6 +28,9 @@ services:
       # Random password for the demo staff accounts; read it in Dashboard → Environment.
       - key: DEMO_STAFF_PASSWORD
         generateValue: true
+      # One-click "Masuk cepat untuk juri" panel on the sign-in pages. Turn off for a real pilot.
+      - key: DEMO_MODE
+        value: "1"
       - key: LLM_PROVIDER
         value: mock
       - key: LLM_FALLBACK_PROVIDER

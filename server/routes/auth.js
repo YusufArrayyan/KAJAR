@@ -146,6 +146,38 @@ export default function register(r) {
     return undefined;
   });
 
+  // Demo mode (DEMO_MODE=1): one-click sign-in for judges and visitors. Off by default; never enable in a pilot.
+  r.get('/api/config', () => ({ demo: process.env.DEMO_MODE === '1' }));
+
+  r.post('/api/auth/demo', ({ body, req, res }) => {
+    if (process.env.DEMO_MODE !== '1') fail(404, 'TIDAK_DITEMUKAN', 'Alamat tidak ditemukan.');
+    rateLimit(`demo:${clientIp(req)}`, 20, 60_000);
+    const { account } = check(body, {
+      account: { type: 'string', label: 'Akun demo', oneOf: ['siswa_baru', 'siswa', 'siswa_tunggu', 'peninjau', 'guru', 'koordinator', 'admin'] },
+    });
+    let u;
+    if (account === 'siswa_baru') {
+      // A fresh student per visitor, so judges see onboarding and the pre-test and do not share a daily limit.
+      const cls = one("SELECT id, school_id FROM classes WHERE name = 'X-1' ORDER BY created_at LIMIT 1");
+      if (!cls) fail(500, 'DEMO_RUSAK', 'Data demo belum siap. Muat ulang halaman.');
+      const nick = `Juri${Math.floor(1000 + Math.random() * 9000)}`;
+      u = insert('users', {
+        role: 'student', display_name: nick, nickname_key: nicknameKey(nick), pin_hash: null, class_id: cls.id,
+        school_id: cls.school_id, pseudonym: newPseudonym(), status: 'aktif', onboarded: 0, prefs: '{}',
+      });
+    } else {
+      const who = {
+        siswa: "nickname_key = 'rani'", siswa_tunggu: "nickname_key = 'dimas'", peninjau: "email = 'bima@kajar.test'",
+        guru: "email = 'sari@kajar.test'", koordinator: "email = 'lestari@kajar.test'", admin: "email = 'admin@kajar.test'",
+      }[account];
+      u = one(`SELECT * FROM users WHERE ${who} AND status = 'aktif'`);
+      if (!u) fail(404, 'AKUN_DEMO_HILANG', 'Akun demo tidak ditemukan. Muat ulang halaman lalu coba lagi.');
+    }
+    audit(u.id, 'masuk_demo', 'users', u.id, { account });
+    createSession(res, u.id);
+    return { me: meView(u), home: u.role === 'student' ? (u.onboarded ? '/beranda' : '/mulai') : '/' };
+  });
+
   r.post('/api/auth/logout', ({ req, res }) => {
     destroySession(req, res);
     return { ok: true };

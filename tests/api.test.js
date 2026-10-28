@@ -284,3 +284,24 @@ test('PRD 12.3 security headers and CSRF guard', async () => {
   const r = await fetch(`${app.base}/api/auth/logout`, { method: 'POST', headers: { origin: 'https://evil.example' } });
   assert.equal(r.status, 403);
 });
+
+test('Demo sign-in is off by default and gives judges a fresh student when on', async () => {
+  assert.equal((await client(app.base).post('/api/auth/demo', { account: 'admin' })).status, 404);
+  assert.equal((await client(app.base).get('/api/config')).body.demo, false);
+  process.env.DEMO_MODE = '1';
+  try {
+    const a = client(app.base);
+    const b = client(app.base);
+    const ra = await a.post('/api/auth/demo', { account: 'siswa_baru' });
+    const rb = await b.post('/api/auth/demo', { account: 'siswa_baru' });
+    assert.equal(ra.body.home, '/mulai');
+    assert.notEqual(ra.body.me.id, rb.body.me.id, 'each judge gets an own account');
+    assert.equal((await a.get('/api/home')).status, 200);
+    const admin = client(app.base);
+    assert.equal((await admin.post('/api/auth/demo', { account: 'admin' })).body.me.role, 'admin');
+    assert.equal((await admin.get('/api/admin/settings')).status, 200);
+    assert.equal((await client(app.base).post('/api/auth/demo', { account: 'root' })).status, 400);
+  } finally {
+    delete process.env.DEMO_MODE;
+  }
+});

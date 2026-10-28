@@ -156,7 +156,7 @@ export default function register(r) {
       `SELECT m.id, m.conversation_id, m.author_name, m.role, m.content_redacted, m.created_at FROM messages m JOIN conversations c ON c.id = m.conversation_id
        WHERE c.user_id = ? AND m.role IN ('reviewer','system') AND m.seen = 0 ORDER BY m.created_at DESC LIMIT 5`, user.id,
     ).map((n) => ({ id: n.id, conversation_id: n.conversation_id, author: n.author_name, preview: n.content_redacted.length > 90 ? `${n.content_redacted.slice(0, 88).trimEnd()}…` : n.content_redacted }));
-    return { me: meView(user), continue: cont, notes };
+    return { me: meView(user), continue: cont, notes, topics, recommended: recs };
   });
 
   // ---- Practice ----------------------------------------------------------------------

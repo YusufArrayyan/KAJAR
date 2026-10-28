@@ -59,3 +59,16 @@ Batang tipis dengan ujung data membulat 4 px, garis kisi samar, tooltip saat dis
 ## Bahasa antarmuka
 
 Sapaan **kamu** untuk siswa, sesuai PRD. Layar staf memakai kalimat perintah tanpa sapaan. Istilah tetap: Masuk, Daftar, Keluar, Simpan, Kirim, Coba lagi. Pesan galat selalu menyebut cara keluar dari masalah. Judul memakai huruf kapital di awal kalimat saja (EYD), bukan Title Case.
+
+## Pembaruan tampilan: gaya aplikasi belajar (permintaan penulis, 28 Oktober 2026)
+
+Tampilan siswa disesuaikan agar terasa seperti aplikasi belajar populer (rujukan: Ruangguru), tetap tanpa gambar bitmap dan font unduhan:
+
+- Tema **terang menjadi bawaan**. Tema gelap tetap tersedia di Profil. Ini menyimpang dari PRD 7.2 ("mengikuti sistem") karena siswa lebih mengenali tampilan terang dari aplikasi belajar yang biasa mereka pakai.
+- Latar `#F3F6FB`, kartu putih dengan sudut 16 px dan **bayangan sangat tipis**. PRD 7.2 meniadakan bayangan demi hemat render; bayangan ini satu lapis CSS tanpa gambar, dan otomatis hilang di tema gelap.
+- Tombol, filter, dan pilihan berbentuk **pil**. Filter terpilih berwarna biru muda dengan garis biru.
+- Beranda punya **pita biru** (gradasi warna logo) berisi sapaan dan tiga angka ringkas, **menu cepat** empat ikon, kartu "Lanjutkan belajar", dan **deretan topik** yang bisa digeser.
+- Setiap topik punya **label glyph dan warna sendiri** (`aⁿ`, `log`, `+b`, `×r`, `Σ`, `xyz`, `x²`, `sin`, `x̄`; token `--t1` sampai `--t9`). Nama topik selalu tertulis, jadi warna bukan satu-satunya penanda. Kontras glyph minimal 4,38:1 (teks besar tebal, syarat 3:1).
+- Halaman masuk memakai pita biru dengan logo di lingkaran putih; formulir menumpuk di atasnya.
+
+Ukuran unduhan setelah perubahan tetap jauh di bawah anggaran (`npm run budget`).

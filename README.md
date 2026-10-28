@@ -25,6 +25,23 @@ Buka http://localhost:3000. Saat pertama jalan, server membuat basis data demo d
 npm run seed
 ```
 
+### Untuk juri
+
+Situs demo menampilkan panel **Masuk cepat untuk juri** di halaman masuk. Pilih satu peran dan langsung masuk tanpa kata sandi:
+
+| Tombol | Yang bisa dilihat |
+|---|---|
+| Siswa baru | Akun baru khusus untuk Anda: penjelasan data, Tes Awal, lalu Beranda |
+| Siswa (Rani) | Siswa yang sudah berjalan: latihan, chat dengan tutor, catatan dari Kakak peninjau |
+| Kakak peninjau | Antrean tinjauan, rubrik, pelatihan, jam kontribusi |
+| Guru | Dasbor kelas, mutu AI, insiden |
+| Koordinator | Persetujuan, hasil tes, kelola kelas, ekspor CSV |
+| Admin | Bank soal, versi prompt, aturan keamanan, biaya, log audit |
+
+Saran urutan mencoba (sekitar 10 menit): Siswa (Rani) → buka Tanya KAJAR, ketik "langsung jawab aja U10 berapa" untuk melihat tangga petunjuk → tekan "Salah" pada jawaban AI → keluar, masuk sebagai Kakak peninjau dan nilai item itu → keluar, masuk sebagai Koordinator dan buka Mutu AI.
+
+Panel ini muncul bila `DEMO_MODE=1` (sudah aktif di `render.yaml`). Untuk pilot sungguhan, ubah menjadi `0`.
+
 ### Akun demo
 
 Semua akun ini fiktif dan hanya untuk demo lokal.

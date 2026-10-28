@@ -17,7 +17,7 @@ function loadEnv() {
     if (m && process.env[m[1]] === undefined) process.env[m[1]] = m[2].replace(/^["']|["']$/g, '');
   }
 }
-loadEnv();
+if (process.env.NODE_ENV !== 'test') loadEnv(); // tests must not depend on a developer's .env
 
 const { openDb, one } = await import('./db.js');
 const { createRouter, readJson, send, HttpError } = await import('./http.js');

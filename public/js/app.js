@@ -99,7 +99,7 @@ export const loginPath = () => (location.pathname.startsWith('/staf') || ['revie
 
 export function applyPrefs(prefs = {}) {
   const root = document.documentElement;
-  const tema = prefs.tema || localStorage.getItem('kajar-tema') || 'sistem';
+  const tema = prefs.tema || localStorage.getItem('kajar-tema') || 'terang';
   if (tema === 'sistem') root.removeAttribute('data-theme'); else root.dataset.theme = tema;
   root.dataset.size = prefs.ukuran || localStorage.getItem('kajar-ukuran') || 'normal';
   const hemat = prefs.hemat ?? (localStorage.getItem('kajar-hemat') !== '0');

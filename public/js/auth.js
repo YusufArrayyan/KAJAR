@@ -8,15 +8,53 @@ function shell(body) {
   return html`<main class="auth stack" id="isi">${body}</main>`;
 }
 
-const brandHead = html`<div class="stack-sm"><span class="logo">${LOGO}</span><h1 translate="no">KAJAR</h1><p class="muted">Belajar ditemani, hemat data</p></div>`;
+// Blue band with the logo; the page content overlaps it.
+function heroShell(body, tagline = 'Belajar ditemani, hemat data') {
+  return html`<div class="auth-hero"><span class="logo-disc">${LOGO}</span><h1 translate="no">KAJAR</h1><p>${tagline}</p></div>
+    <main class="auth lifted stack" id="isi">${body}</main>`;
+}
+
+let configPromise;
+const getConfig = () => (configPromise ||= api('/api/config').catch(() => ({ demo: false })));
+
+// DEMO_MODE only: judges and visitors sign in with one click, no passwords.
+const DEMO_ACCOUNTS = [
+  ['siswa_baru', 'Siswa baru', 'Mulai dari penjelasan data dan Tes Awal'],
+  ['siswa', 'Siswa (Rani)', 'Sudah berjalan, ada catatan dari Kakak'],
+  ['peninjau', 'Kakak peninjau', 'Antrean tinjauan dan rubrik'],
+  ['guru', 'Guru', 'Dasbor kelas dan insiden'],
+  ['koordinator', 'Koordinator', 'Persetujuan, hasil tes, ekspor'],
+  ['admin', 'Admin', 'Konten, prompt, keamanan, biaya'],
+];
+const demoPanel = (cfg) => (cfg.demo ? html`<section class="card demo-panel stack-sm" aria-labelledby="demo-h">
+  <span class="chip topic">Mode demo</span><h2 id="demo-h">Masuk cepat untuk juri</h2>
+  <p class="caption">Pilih peran, langsung masuk tanpa kata sandi. Semua data di sini contoh dan diulang dari awal saat server dimulai ulang.</p>
+  <div class="demo-grid">${DEMO_ACCOUNTS.map(([k, label, hint]) => html`<button class="btn secondary" type="button" data-action="demo" data-account="${k}">${label}<small>${hint}</small></button>`)}</div>
+  <p class="form-error field-error" role="alert" hidden></p></section>` : '');
+
+const demoActions = {
+  async demo(btn) {
+    await busy(btn, 'Masuk…', async () => {
+      try {
+        const r = await api('/api/auth/demo', { method: 'POST', body: { account: btn.dataset.account } });
+        location.href = r.home;
+      } catch (err) {
+        const box = btn.closest('section').querySelector('.form-error');
+        box.hidden = false;
+        box.textContent = err.message;
+      }
+    });
+  },
+};
 
 export default function register() {
   setHome(() => (location.pathname.startsWith('/staf') ? '/staf/masuk' : '/masuk'));
 
-  route('/masuk', () => ({
+  route('/masuk', async () => ({
     title: 'Masuk',
-    body: shell(html`${brandHead}
-      <form data-form="login" class="card stack" novalidate>
+    actions: demoActions,
+    body: heroShell(html`${demoPanel(await getConfig())}
+      <form data-form="login" class="card stack" novalidate><h2>Masuk sebagai siswa</h2>
         <div class="field"><label for="nick">Nama panggilan</label>
           <input id="nick" name="nickname" type="text" autocomplete="username" spellcheck="false" autocapitalize="words" maxlength="20" required></div>
         <div class="field"><label for="pin">PIN (6 angka)</label>
@@ -113,9 +151,9 @@ export default function register() {
     };
   });
 
-  route('/staf/masuk', ({ query }) => ({
+  route('/staf/masuk', async ({ query }) => ({
     title: 'Masuk staf',
-    body: shell(html`${brandHead}
+    body: heroShell(html`${demoPanel(await getConfig())}
       <h2>Masuk untuk peninjau, guru, dan admin</h2>
       ${query.get('tautan') === 'kedaluwarsa' ? banner('warn', 'Tautan masuk sudah kedaluwarsa atau sudah dipakai. Minta tautan baru.') : ''}
       <form data-form="staff" class="card stack" novalidate>
@@ -143,6 +181,7 @@ export default function register() {
       },
     },
     actions: {
+      ...demoActions,
       async magic(btn) {
         const form = btn.closest('form');
         const email = form.email.value.trim();
