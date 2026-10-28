@@ -146,4 +146,5 @@ def main():
     print("mockups", sorted(p.name for p in OUT.glob("*.png")))
 
 
-main()
+if __name__ == "__main__":
+    main()

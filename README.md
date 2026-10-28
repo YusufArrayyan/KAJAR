@@ -89,6 +89,7 @@ Skrip di `tools/media/` membuat video penggunaan bersuara dan gambar mockup pons
 | `media/kajar-demo.srt` | Subtitle narasi |
 | `media/mockup/gambar-1-siswa.png` | Gambar esai: Masuk, Beranda, Tanya KAJAR, Latihan |
 | `media/mockup/gambar-2-peninjau-guru.png` | Gambar esai: Peninjau, Dasbor guru, Mutu AI |
+| `media/panduan-kajar.pdf` | Panduan visual A4, 7 halaman: membuka situs (QR), masuk cepat untuk juri, alur siswa, peninjau, dasbor, rute demo 10 menit |
 | `media/mockup/*.png` | Tiap layar dalam bingkai ponsel (latar transparan) dan tangkapan layar polos (`layar-*.png`) |
 
 Membuat ulang (butuh Python dengan `playwright`, `edge-tts`, `imageio-ffmpeg`, `Pillow`; narasi dibuat oleh layanan suara Microsoft lewat `edge-tts`):
@@ -98,6 +99,7 @@ Membuat ulang (butuh Python dengan `playwright`, `edge-tts`, `imageio-ffmpeg`, `
 3. `python tools/media/record.py http://localhost:3300`
 4. `python tools/media/mockups.py http://localhost:3300`
 5. `python tools/media/build_video.py`
+6. Panduan PDF: jalankan server dengan `DEMO_MODE=1` di port 3301, lalu `python tools/media/guide_shots.py http://localhost:3301` dan `python tools/media/build_guide.py` (butuh `segno` untuk kode QR).
 
 ## Memeriksa mutu
 
